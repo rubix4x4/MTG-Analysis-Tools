@@ -8,13 +8,15 @@ sys.path.append(os.getcwd() + "\\Lib")
 import ParseFunctions as PF
 
 f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
+#f = open('Parsed Data Sets/SmallDevSet.json', encoding='utf8')
+
 data = json.load(f)
 PandaData = pd.DataFrame.from_records(data)
 
 # Normalize card value
 WorstCardValue = max(PandaData[:]['edhrec_rank'])       # I'll be using edhrec rank as a objective measure of a cards approximate value/power
 
-
+# Simpler Normalization Functions
 def EDHRECNormalize(a):
     if np.isnan(a):
         a = WorstCardValue

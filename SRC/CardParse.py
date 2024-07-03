@@ -15,7 +15,7 @@ PandaData = pd.DataFrame.from_records(data)
 Columns = PandaData.columns
 # Columns of Interest (TEMP SKIP TO ID WHAT IS NEEDED FOR MULTISIDE/FORM CARDS)
 
-CoI = ['name','cmc', 'mana_cost','type_line','oracel_text','color_identity','keywords','legalities','power','toughness','edhrec_rank','layout','card_faces']
+CoI = ['name','cmc', 'mana_cost','type_line','oracle_text','color_identity','keywords','legalities','power','toughness','edhrec_rank','layout','card_faces']
 
 for x in Columns:
     if x not in CoI:
@@ -29,4 +29,8 @@ for index, row in  PandaData.iterrows():
         rowdrop.append(index)                           # create an array with all non-legal card indices
 PandaData = PandaData.drop(rowdrop)                     # Drop all cards that are not commander legal
 print("Dropped ",len(rowdrop), " rows")
-ParseFunc.WriteJsonFromPD(PandaData,'CommanderLegal')  
+#ParseFunc.WriteJsonFromPD(PandaData,'CommanderLegal')  
+
+# Create Smaller Subset of Data that I can do development on
+SmallSet = PandaData.tail(n = 5000)
+#ParseFunc.WriteJsonFromPD(SmallSet,'SmallDevSet')
