@@ -2,7 +2,6 @@ import json
 import pandas as pd
 
 def WriteJsonFromPD(Data,FileName):
-    
     result = Data.to_json(orient="records")
     parsed = json.loads(result)
     s = json.dumps(parsed, indent = 4)
