@@ -28,25 +28,4 @@ for index, row in  PandaData.iterrows():
         rowdrop.append(index)                           # create an array with all non-legal card indices
 PandaData = PandaData.drop(rowdrop)                     # Drop all cards that are not commander legal
 print("Dropped ",len(rowdrop), " rows")
-#ParseFunc.WriteJsonFromPD(PandaData,'CommanderLegal')
-
-
-# Normalize card value
-WorstCardValue = max(PandaData[:]['edhrec_rank'])       # I'll be using edhrec rank as a objective measure of a cards approximate value/power
-def EDHRECNormalize(a):
-    if np.isnan(a):
-        a = WorstCardValue
-    Value = a/(WorstCardValue+1e-6)
-    return Value
-def cmcNormalize(a):
-    Value = a/max(PandaData['cmc'])
-    return Value
-PandaData['edhrec_rank'] = PandaData['edhrec_rank'].apply(EDHRECNormalize)
-PandaData['cmc'] = PandaData['cmc'].apply(cmcNormalize)
-
-
-
-
-
-
-print("End")
+#ParseFunc.WriteJsonFromPD(PandaData,'CommanderLegal')  # Disable json Rewrite
