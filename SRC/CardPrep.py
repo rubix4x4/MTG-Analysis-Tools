@@ -7,7 +7,6 @@ import numpy as np
 sys.path.append(os.getcwd() + "\\Lib")
 import ParseFunctions as PF
 
-
 f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
 data = json.load(f)
 PandaData = pd.DataFrame.from_records(data)
@@ -30,10 +29,8 @@ print("EDHREC Rank Normalized")
 PandaData['cmc'] = PandaData['cmc'].apply(cmcNormalize)
 print("Overall CmC Normalized")
 
-# Create Card Type Binary Values
-PandaData = PF.TagCardTypes(PandaData)
-
-# Create Reinterpreted Mana Cost data
+PandaData = PF.TagCardTypes(PandaData)                  # Tag Card Types and Append New Columns
+PandaData = PF.TagManaCosts(PandaData)                  # Tag Card Costs that have special stipulations
 
 
 

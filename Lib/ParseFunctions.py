@@ -1,3 +1,4 @@
+import numpy as np
 import json
 import pandas as pd
 
@@ -24,7 +25,32 @@ def TagCardTypes(Data):
     
     # Turn Card List Array into a dataframe object
     CardTypeDF = pd.DataFrame(CardListArray, columns = CardTypes)
-    print ("End")
     NewSet = Data.join(CardTypeDF)
+    return NewSet
+
+
+def TagManaCosts(Data):
+    ManaCost_Tags = ['{W}','{U}','{B}','{R}','{G}', '{C}'                                                           # WUBRG
+        ,'{W/P}','{U/P}','{B/P}','{R/P}','{G/P}'                                                                    # Phyrexian WUBRG
+        ,'{2/W}','{2/U}','{2/B}','{2/R}','{2/G}'                                                                    # 2 or Color
+        ,'{C/W}','{C/U}','{C/B}','{C/R}','{C/G}'                                                                    # Colorless or Color
+        ,'{W/U}','{W/B}','{B/R}','{B/G}','{U/B}','{U/R}','{R/G}','{R/W}','{G/W}','{G/U}'                            # Guild Color
+        ,'{W/U/P}','{W/B/P}','{B/R/P}','{B/G/P}','{U/B/P}','{U/R/P}','{R/G/P}','{R/W/P}','{G/W/P}','{G/U/P}']       # Phyrexian Guild Color
+    ManaArray = []
+    for index, row in  Data.iterrows():
+        CardManaVector = []
+        if row['mana_cost'] == None: # Probably Dual Sided Card
+            CardManaVector.append(np.zeros(len(ManaCost_Tags),dtype = int))
+        else:
+            for Tag in ManaCost_Tags:
+                if Tag in row['mana_cost']:
+                    CardManaVector.append(row['mana_cost'].count(Tag))
+                else:
+                    CardManaVector.append(0)
+        ManaArray.append(CardManaVector)
+    
+    # Turn Mana Array into a dataframe object and join to Data
+    ManaCostDF = pd.DataFrame(ManaArray, columns = ManaCost_Tags)
+    NewSet = Data.join(ManaCostDF)
     return NewSet
         
