@@ -9,3 +9,22 @@ def WriteJsonFromPD(Data,FileName):
     FileOutType = ".json"
     FileOut = FileLocation + "/" + FileName + FileOutType
     open(FileOut,"w").write(s)
+
+def TagCardTypes(Data):
+    CardTypes = ['Creature','Enchantment','Sorcery','Instant','Artifact','Battle', 'Planeswalker']
+    CardListArray = []
+    for index, row in  Data.iterrows():
+        CardTypeVector = []
+        for type in CardTypes:
+            if type in row['type_line']:
+                CardTypeVector.append(1)
+            else:
+                CardTypeVector.append(0)
+        CardListArray.append(CardTypeVector)
+    
+    # Turn Card List Array into a dataframe object
+    CardTypeDF = pd.DataFrame(CardListArray, columns = CardTypes)
+    print ("End")
+    NewSet = Data.join(CardTypeDF)
+    return NewSet
+        
