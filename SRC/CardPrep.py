@@ -8,8 +8,8 @@ import numpy as np
 sys.path.append(os.getcwd() + "\\Lib")
 import ParseFunctions as PF
 
-#f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
-f = open('Parsed Data Sets/SmallDevSet.json', encoding='utf8')
+f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
+#f = open('Parsed Data Sets/SmallDevSet.json', encoding='utf8')
 
 data = json.load(f)
 PandaData = pd.DataFrame.from_records(data)
@@ -37,7 +37,8 @@ PandaData = PF.TagManaCosts(PandaData)                  # Tag Card Costs that ha
 
 # Simplify Oracle Text
 PandaData = PF.OracleCleanup(PandaData)                 # Replace cardname text with Self, remove keyword explanations
-#PF.WriteJsonFromPD(PandaData,'SmallSetPreClassifier')
 
+#PF.WriteJsonFromPD(PandaData.tail(n=5000),'SmallSetPreClassifier')
+PF.WriteJsonFromPD(PandaData,'FullSetPreClassifier')
 print(PandaData.tail(n=5))
 

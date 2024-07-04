@@ -73,13 +73,24 @@ def OracleCleanup(Data):
         OText = re.sub("[\(\[].*?[\)\]]", "", OText)
         
         for Name in Names:
-            OText = re.sub(Name,"Self",OText)
-                
+            OText = re.sub(re.escape(Name),"Self",OText)
+     
         OText = re.sub("\n"," ",OText)    
         # Replace Uncleaned Oracle Text
-        Data.loc[index, 'oracle_text'] = OText
-        
-
+        Data.loc[index, 'oracle_text'] = OText   
     return Data
         
+def EdhrecLabels(Data):
+    Labels = []
+    for index, card in  Data.iterrows():
+        Edhrec_Rank = card['edhrec_rank']
         
+        if Edhrec_Rank >= 0.11746066433138619:
+            Labels.append(2) # Less than 2%
+        
+        elif (Edhrec_Rank >= 0.055179195802186075 and Edhrec_Rank <0.11746066433138619):
+            Labels.append(1) # Between 2 to 5%
+            
+        elif Edhrec_Rank < 0.055179195802186075:
+            Labels.append(0) # Greater than 5%
+    return Labels
