@@ -37,14 +37,7 @@ PandaData = PF.TagManaCosts(PandaData)                  # Tag Card Costs that ha
 
 # Simplify Oracle Text
 PandaData = PF.OracleCleanup(PandaData)                 # Replace cardname text with Self, remove keyword explanations
-
-
-PF.WriteJsonFromPD(PandaData,'SmallSetPreClassifier')
-
-
-
-
-
+#PF.WriteJsonFromPD(PandaData,'SmallSetPreClassifier')
 
 print(PandaData.tail(n=5))
 
