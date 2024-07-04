@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import pandas as pd
+import re
 
 def WriteJsonFromPD(Data,FileName):
     result = Data.to_json(orient="records")
@@ -27,7 +28,6 @@ def TagCardTypes(Data):
     CardTypeDF = pd.DataFrame(CardListArray, columns = CardTypes)
     NewSet = Data.join(CardTypeDF)
     return NewSet
-
 
 def TagManaCosts(Data):
     ManaCost_Tags = ['{W}','{U}','{B}','{R}','{G}', '{C}'                                                           # WUBRG
@@ -57,3 +57,29 @@ def TagManaCosts(Data):
     ManaCostDF = pd.DataFrame(ManaArray, columns = ManaCost_Tags)
     NewSet = Data.join(ManaCostDF)
     return NewSet
+
+def OracleCleanup(Data):
+    for index, card in  Data.iterrows():
+        # Concatenate cards with multiple faces
+        Names = []           # Initialize Empty Name
+        OText = ""          # Initialize Empty String OracleText
+        if card['card_faces'] != None:
+            for CardFace in card['card_faces']:
+                Names.append(CardFace['name'])
+                OText = OText + CardFace['oracle_text']
+        else:
+            Names.append(card['name'])
+            OText = card['oracle_text']
+        OText = re.sub("[\(\[].*?[\)\]]", "", OText)
+        
+        for Name in Names:
+            OText = re.sub(Name,"Self",OText)
+                
+        OText = re.sub("\n"," ",OText)    
+        # Replace Uncleaned Oracle Text
+        Data.loc[index, 'oracle_text'] = OText
+        
+
+    return Data
+        
+        
