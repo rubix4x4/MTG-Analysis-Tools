@@ -12,7 +12,6 @@ print(torch.cuda.get_device_name())
 
 from datasets import Dataset
 from transformers import AutoModelForSequenceClassification, DataCollatorWithPadding, AutoTokenizer, TrainingArguments, Trainer, pipeline
-from datasets import load_dataset, load_metric
 import evaluate
 
 # region TextClassifier Pretrained Model Definition

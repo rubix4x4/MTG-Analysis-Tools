@@ -10,8 +10,8 @@ import torch.nn as nn                           # Neural Network Modules and Los
 import torch.optim as optim                     # Optimization algorithms
 import torch.nn.functional as Functional        # Functions with no parameters
 from torch.utils.data import DataLoader         # Easier data set management
-import torchvision.datasets as datasets         # Gives us access to datasets that already exist
-import torchvision.transforms as transforms     # Gives us access to transformations on data set
+# import torchvision.datasets as datasets         # Gives us access to datasets that already exist
+# import torchvision.transforms as transforms     # Gives us access to transformations on data set
 
 # Pre Network Data Manipulation
 import pandas as pd
@@ -22,10 +22,10 @@ import sklearn.preprocessing as SKPRE
 class NN(nn.Module):
     def __init__(self, input_size, num_classes):
         super(NN,self).__init__()
-        self.fc1 = nn.Linear(input_size,50)
-        self.fc2 = nn.Linear(50,50)
-        self.fc3 = nn.Linear(50,50)
-        self.fc4 = nn.Linear(50,num_classes)
+        self.fc1 = nn.Linear(input_size,55)
+        self.fc2 = nn.Linear(55,55)
+        self.fc3 = nn.Linear(55,55)
+        self.fc4 = nn.Linear(55,num_classes)
         
     def forward(self,x): # This basically describes how we move from one layer to the next
         x = Functional.relu(self.fc1(x))
@@ -94,7 +94,7 @@ input_size = 55
 num_classes = 1 # we only want 1 NN output (edhrec_rank)
 learning_rate = 0.001
 batch_size = 64
-num_epochs = 1
+num_epochs = 10
 #device = 'cpu'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -103,11 +103,12 @@ model = NN(input_size = input_size, num_classes= num_classes).to(device)
 
 # Loss and Optimizer
 #criterion = nn.CrossEntropyLoss()
-criterion = nn.MSELoss()
+criterion = nn.L1Loss()
 optimizer = optim.Adam(model.parameters(), lr= learning_rate)
 
 # Train Network
 for epoch in range(num_epochs):
+    print(epoch)
     for batch_idx, (data, targets) in enumerate(TrainDataloader):
         data = data.to(device=device)
         targets = targets.to(device=device)
@@ -125,16 +126,23 @@ for epoch in range(num_epochs):
         
         # gradient descent vs adam step
         optimizer.step()
-
-# Check Accuracy
-def check_accuracy(loader,model):
-    model.eval()
     
-    with torch.no_grad():
-        for x, y in loader:
-            x = x.to(device=device)
-            y = y.to(device=device)
-            x = x.reshape(x.shape[0],-1)
+    print('Loss = ' ,loss.item())
+print("Done")
+
+
+# # Check Accuracy
+# def check_accuracy(loader,model):
+#     model.eval()
+#     with torch.no_grad():
+#         for x, y in loader:
+#             x = x.to(device=device)
+#             y = y.to(device=device)
+#             x = x.reshape(x.shape[0],-1)
             
-            scores = model(x)
-            
+#             score = model(x)
+#             targets = y
+#             loss = criterion(score,targets)
+#     model.train()
+    
+# check_accuracy(TrainDataloader, model)
