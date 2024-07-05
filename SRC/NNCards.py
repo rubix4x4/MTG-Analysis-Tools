@@ -48,8 +48,6 @@ class CustomDataSet:
         label = self.labels[idx]
         return feature, label
 
-# Check that Graphics Card is Available
-
 # Load PandaDataSet
 f = open('Parsed Data Sets/FullPostOracleAnalysis.json', encoding='utf8')
 data = json.load(f)
@@ -129,20 +127,3 @@ for epoch in range(num_epochs):
     
     print('Loss = ' ,loss.item())
 print("Done")
-
-
-# # Check Accuracy
-# def check_accuracy(loader,model):
-#     model.eval()
-#     with torch.no_grad():
-#         for x, y in loader:
-#             x = x.to(device=device)
-#             y = y.to(device=device)
-#             x = x.reshape(x.shape[0],-1)
-            
-#             score = model(x)
-#             targets = y
-#             loss = criterion(score,targets)
-#     model.train()
-    
-# check_accuracy(TrainDataloader, model)
