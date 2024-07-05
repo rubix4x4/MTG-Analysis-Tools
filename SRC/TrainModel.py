@@ -9,7 +9,6 @@ import ParseFunctions as ParseFunc
 
 print(torch.cuda.is_available())
 print(torch.cuda.get_device_name())
-sys.path.append(os.getcwd() + "\\Lib")
 
 from datasets import Dataset
 from transformers import AutoModelForSequenceClassification, DataCollatorWithPadding, AutoTokenizer, TrainingArguments, Trainer, pipeline

@@ -94,3 +94,13 @@ def EdhrecLabels(Data):
         elif Edhrec_Rank < 0.055179195802186075:
             Labels.append(0) # Greater than 5%
     return Labels
+
+def PowToughFix(value):
+    if value == None:
+        value = 0
+    elif '*' in str(value):
+        value = re.sub(re.escape('*'),'0',value)
+        value = eval(value)
+    else:
+        value = eval(value)
+    return value
