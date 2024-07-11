@@ -26,7 +26,6 @@ model = SimpleNN(input_size, hidden_size, output_size)
 # Print the model architecture
 print(model)
 
-
 # Loss and optimizer
 criterion = nn.MSELoss()  # For regression tasks; use nn.CrossEntropyLoss for classification tasks
 optimizer = optim.Adam(model.parameters(), lr=0.001)

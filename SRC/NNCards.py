@@ -22,10 +22,10 @@ import sklearn.preprocessing as SKPRE
 class NN(nn.Module):
     def __init__(self, input_size, num_classes):
         super(NN,self).__init__()
-        self.fc1 = nn.Linear(input_size,55)
-        self.fc2 = nn.Linear(55,55)
-        self.fc3 = nn.Linear(55,55)
-        self.fc4 = nn.Linear(55,num_classes)
+        self.fc1 = nn.Linear(input_size,256)
+        self.fc2 = nn.Linear(256,256)
+        self.fc3 = nn.Linear(256,256)
+        self.fc4 = nn.Linear(256,num_classes)
         
     def forward(self,x): # This basically describes how we move from one layer to the next
         x = Functional.relu(self.fc1(x))
@@ -90,7 +90,7 @@ TrainDataloader = DataLoader(MyData, batch_size = 64, shuffle=True)
 # Model Hyperpparameters
 input_size = 55
 num_classes = 1 # we only want 1 NN output (edhrec_rank)
-learning_rate = 0.001
+learning_rate = 0.0005
 batch_size = 64
 num_epochs = 10
 #device = 'cpu'
@@ -100,7 +100,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = NN(input_size = input_size, num_classes= num_classes).to(device)
 
 # Loss and Optimizer
-#criterion = nn.CrossEntropyLoss()
 criterion = nn.L1Loss()
 optimizer = optim.Adam(model.parameters(), lr= learning_rate)
 
