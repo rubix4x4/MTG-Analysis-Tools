@@ -30,31 +30,78 @@ def TagCardTypes(Data):
     return NewSet
 
 def TagManaCosts(Data):
-    ManaCost_Tags = ['{W}','{U}','{B}','{R}','{G}', '{C}'                                                           # WUBRG
-        ,'{W/P}','{U/P}','{B/P}','{R/P}','{G/P}'                                                                    # Phyrexian WUBRG
-        ,'{2/W}','{2/U}','{2/B}','{2/R}','{2/G}'                                                                    # 2 or Color
-        ,'{C/W}','{C/U}','{C/B}','{C/R}','{C/G}'                                                                    # Colorless or Color
-        ,'{W/U}','{W/B}','{B/R}','{B/G}','{U/B}','{U/R}','{R/G}','{R/W}','{G/W}','{G/U}'                            # Guild Color
-        ,'{W/U/P}','{W/B/P}','{B/R/P}','{B/G/P}','{U/B/P}','{U/R/P}','{R/G/P}','{R/W/P}','{G/W/P}','{G/U/P}']       # Phyrexian Guild Color
-    ManaArray = []
+    Reg_Cost = ['{W}','{U}','{B}','{R}','{G}', '{C}']                                                                       # WUBRGC
+    RegOrTwo = ['{2/W}','{2/U}','{2/B}','{2/R}','{2/G}']                                                                    # 2 or Color
+    OptionalColor = ['{C/W}','{C/U}','{C/B}','{C/R}','{C/G}']                                                                    # Colorless or Color
+    GuildColor = ['{W/U}','{W/B}','{B/R}','{B/G}','{U/B}','{U/R}','{R/G}','{R/W}','{G/W}','{G/U}']                           # Guild Color
+    ManaArray = [0,0,0,0,0,0]
+    CardManaVector = []
+    # This map correlates the Tag to how each count thereof adjust the ManaArray
+    GuildMap = {'{W/U}':[0.5, 0.5, 0, 0, 0, 0],
+        '{W/B}':[0.5, 0, 0.5, 0, 0, 0,],
+        '{B/R}':[0, 0, 0.5, 0.5, 0, 0],
+        '{B/G}':[0, 0, 0.5, 0, 0.5, 0],
+        '{U/B}':[0, 0.5, 0.5, 0, 0, 0],
+        '{U/R}':[0, 0.5, 0, 0.5, 0, 0],
+        '{R/G}':[0, 0, 0, 0.5, 0.5, 0],
+        '{R/W}':[0.5, 0, 0, 0.5, 0, 0],
+        '{G/W}':[0.5, 0, 0, 0, 0.5, 0],
+        '{G/U}':[0, 0.5, 0, 0, 0.5, 0],
+        '{C/W}':[0.5, 0, 0, 0, 0, 0.5],
+        '{C/U}':[0, 0.5, 0, 0, 0, 0.5],
+        '{C/B}':[0, 0, 0.5, 0, 0, 0.5],
+        '{C/R}':[0, 0, 0, 0.5, 0, 0.5],
+        '{C/G}':[0, 0, 0, 0, 0.5, 0.5]
+        }
+      
     for index, row in  Data.iterrows():
-        CardManaVector = []
+        # Adjust CardManaVector to just WURBG and Colorless
+        # Phyrexian Mana is counted as free as it functionally has no cost in commander
+        ManaArray = [0,0,0,0,0,0]
         ManaCost = row['mana_cost']
         # Special Cases: when card has multiple faces, sum the two cards together
         if row['card_faces'] != None:                                                   
-                ManaCost = ""
-                for card in row['card_faces']:
-                    ManaCost = ManaCost + ' ' + card['mana_cost']
-        # Seach ManaCost for different tags
-        for Tag in ManaCost_Tags:
-            if Tag in ManaCost:
-                    CardManaVector.append(ManaCost.count(Tag))
-            else:
-                CardManaVector.append(0)
-        ManaArray.append(CardManaVector)
-    
+            ManaCost = ""
+            for card in row['card_faces']:
+                ManaCost = ManaCost + ' ' + card['mana_cost']
+        
+        # Seach ManaCost for Regular Costs
+        for Ind, Tag in enumerate(Reg_Cost):
+            Count = ManaCost.count(Tag)
+            ManaArray[Ind] += Count
+        
+        # Seach ManaCost for RegOrTwo
+        for Ind, Tag in enumerate(RegOrTwo):
+            Count = ManaCost.count(Tag)
+            ManaArray[Ind] += Count # Adds number of counts. Most will try to use colored mana over paying 2 of generic
+
+        # Split the difference between colored and the colorless cost
+        NPManaArray = np.array(ManaArray, dtype=float)
+        for Tag in OptionalColor:
+            OptionalColorArray = GuildMap[Tag]
+            NPOptionalColorArray = np.array(OptionalColorArray)
+            Count = ManaCost.count(Tag)
+            ManaAdjust = Count*NPOptionalColorArray
+            NPManaArray += ManaAdjust
+        
+        # Guild Colors
+        # Convert ManaArray to an np array for next step
+        for Tag in GuildColor:
+            GuildArray = GuildMap[Tag]
+            NPGuildArray = np.array(GuildArray)
+            Count = ManaCost.count(Tag)
+            ManaAdjust = Count*NPGuildArray
+            NPManaArray += ManaAdjust
+            
+            
+        # NOTE PHYREXIAN Mana has been ignored. For the purposes of commander, 
+        # I am making the assumption that most players will choose to pay 2 life over the mana cost
+            
+        ManaArray = NPManaArray.tolist()
+        CardManaVector.append(ManaArray)
+
     # Turn Mana Array into a dataframe object and join to Data
-    ManaCostDF = pd.DataFrame(ManaArray, columns = ManaCost_Tags)
+    ManaCostDF = pd.DataFrame(CardManaVector, columns = Reg_Cost)
     NewSet = Data.join(ManaCostDF)
     return NewSet
 

@@ -15,7 +15,8 @@ PandaData = pd.DataFrame.from_records(data)
 Columns = PandaData.columns
 # Columns of Interest (TEMP SKIP TO ID WHAT IS NEEDED FOR MULTISIDE/FORM CARDS)
 
-CoI = ['name','cmc', 'mana_cost','type_line','oracle_text','color_identity','keywords','legalities','power','toughness','edhrec_rank','layout','card_faces']
+CoI = ['name','cmc', 'mana_cost','type_line',
+       'oracle_text','color_identity','keywords','legalities','power','toughness','edhrec_rank','layout','card_faces']
 
 for x in Columns:
     if x not in CoI:

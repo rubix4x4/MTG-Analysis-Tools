@@ -5,11 +5,12 @@ import json
 import os
 import sys
 import numpy as np
+import matplotlib as plt
 sys.path.append(os.getcwd() + "\\Lib")
 import ParseFunctions as PF
 
-f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
-#f = open('Parsed Data Sets/SmallDevSet.json', encoding='utf8')
+#f = open('Parsed Data Sets/CommanderLegal.json', encoding='utf8')
+f = open('Parsed Data Sets/SmallDevSet.json', encoding='utf8')
 
 data = json.load(f)
 PandaData = pd.DataFrame.from_records(data)
@@ -27,18 +28,21 @@ def cmcNormalize(a):
     Value = a/max(PandaData['cmc'])
     return Value
 
-PandaData['edhrec_rank'] = PandaData['edhrec_rank'].apply(EDHRECNormalize)
+PandaData['edhrec_rank'] = PandaData['edhrec_rank'].apply(EDHRECNormalize) 
 print("EDHREC Rank Normalized")
 PandaData['cmc'] = PandaData['cmc'].apply(cmcNormalize)
 print("Overall CmC Normalized")
 
 PandaData = PF.TagCardTypes(PandaData)                  # Tag Card Types and Append New Columns
+print("Card Types Tagged")
+
 PandaData = PF.TagManaCosts(PandaData)                  # Tag Card Costs that have special stipulations
+print("Mana Costs Tagged")
 
-# Simplify Oracle Text
 PandaData = PF.OracleCleanup(PandaData)                 # Replace cardname text with Self, remove keyword explanations
+print("Oracle text Cleanup")
 
-#PF.WriteJsonFromPD(PandaData.tail(n=5000),'SmallSetPreClassifier')
-PF.WriteJsonFromPD(PandaData,'FullSetPreClassifier')
+PF.WriteJsonFromPD(PandaData.tail(n=5000),'SmallSetPreClassifier')
+#PF.WriteJsonFromPD(PandaData,'FullSetPreClassifier')
 print(PandaData.tail(n=5))
 
