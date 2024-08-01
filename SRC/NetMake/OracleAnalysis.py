@@ -1,3 +1,4 @@
+# This section of code takes the card data and populates label and confidence score fields for each card based on their oracle text
 import os
 import sys
 sys.path.append(os.getcwd() + "\\Lib")
@@ -9,6 +10,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
 
+import time
+
 print(torch.cuda.is_available())
 print(torch.cuda.get_device_name())
 
@@ -19,19 +22,26 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 classifier = pipeline ("sentiment-analysis", model=model, tokenizer=tokenizer, device=0)
 
 datapandas = pd.read_json('Parsed Data Sets/FullSetPreClassifier.json')
-#datapandas = datapandas.sample(n=100)
-datapandas.reset_index(drop=True, inplace=True)
+#datapandas = pd.read_json('Parsed Data Sets/SmallSetPreClassifier.json')
 
 TierLabels = ['LABEL_0','LABEL_1','LABEL_2']
 TierVector = []
 TierArray = []
 ConfidenceArray = []
 
-# # Check if can do all at onece?
+# Check if can do all at once?
+start = time.time()
+print("Start Oracle Analysis")
+
 JustText = datapandas['oracle_text']
 TextList = JustText.to_list()
 OracleAnalyzed = classifier(TextList)
 
+end = time.time()
+Duration = end-start
+print("Oracle Analysis End after", Duration, "seconds")
+
+print("Write to DataFrame)")
 for Result in OracleAnalyzed:
     TierVector = []
     Tier = Result['label']

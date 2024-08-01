@@ -9,9 +9,8 @@ Model usually has L1Loss errors in the mid teens (15-19%)
 Ultimately, this means that the tool is useful in the sense that it's better than strictly guessing, but that 15% difference in edhrec rank can span the difference from being used in every conceivable deck (Sol Ring), to being used in less than 1% of capable decks.
 
 Improvement TODO:
+- It doesn't make sense to be comparing cards of disparate types to each other. Reparse data based on card type and then train individualized models for each.
 - Text Classification
     - Improvement TODO: Edhrec Rank is not debiased with respect to other training inputs
-- Mana costs
-    - Improvement TODO: Reduce input size, redistribute special mana costs (hybrid, phyrexian etc.) into the primary color bins
 - Data Normalization
     - Improvement TODO: Current normalization is min max, adjust to z-score normalization (mean = 0, variance = 1)

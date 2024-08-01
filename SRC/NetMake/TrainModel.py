@@ -1,3 +1,4 @@
+# Train the Oracle Text Analyzer 
 import pandas as pd
 import json
 import os
@@ -14,9 +15,11 @@ from datasets import Dataset
 from transformers import AutoModelForSequenceClassification, DataCollatorWithPadding, AutoTokenizer, TrainingArguments, Trainer, pipeline
 import evaluate
 
+import matplotlib.pyplot as plt
+
 # region TextClassifier Pretrained Model Definition
 # Select Model-base
-checkpoint = "distilbert-base-uncased"
+checkpoint = "bert-base-uncased"
 
 # Select our Tokenizer
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
@@ -26,8 +29,9 @@ model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_label
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 # endregion
 
-# Load PandaDataSet
-f = open('Parsed Data Sets/FullSetPreClassifier.json', encoding='utf8')
+# Load DataSet
+#f = open('Parsed Data Sets/FullSetPreClassifier.json', encoding='utf8')
+f = open('Parsed Data Sets/PreClass/CreaturePreClass.json', encoding='utf8')
 data = json.load(f)
 ClassifierData = pd.DataFrame.from_records(data)
 
@@ -37,6 +41,9 @@ CoI = ['edhrec_rank','oracle_text']
 for x in ClassifierData.columns:
     if x not in CoI:
         ClassifierData = ClassifierData.drop(x, axis=1)
+
+plt.plot(ClassifierData['edhrec_rank'], 'o', color='black')
+plt.show()
 
 # Assign EDHREC Rank Based Labels
 Labels = ParseFunc.EdhrecLabels(ClassifierData)
@@ -92,6 +99,6 @@ trainer = Trainer(
 
 trainer.train()
 print(trainer.evaluate())
-trainer.save_model('Models\MTG_Oracle_Analysis')
+trainer.save_model('Models\MTG_Oracle_Analysis_Creature')
 
 print('checkpoint')

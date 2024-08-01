@@ -1,4 +1,4 @@
-# The Purpose of this code snippet is to load the card data from the json file and sort them.
+# The Purpose of this is to create and train the NN model
 import os
 import sys
 sys.path.append(os.getcwd() + "\\Lib")
@@ -10,14 +10,13 @@ import torch.nn as nn                           # Neural Network Modules and Los
 import torch.optim as optim                     # Optimization algorithms
 import torch.nn.functional as Functional        # Functions with no parameters
 from torch.utils.data import DataLoader         # Easier data set management
-# import torchvision.datasets as datasets         # Gives us access to datasets that already exist
-# import torchvision.transforms as transforms     # Gives us access to transformations on data set
 
 # Pre Network Data Manipulation
 import pandas as pd
 import numpy as np
 import ParseFunctions as PF
 import sklearn.preprocessing as SKPRE
+import matplotlib.pyplot as plt
 
 class NN(nn.Module):
     def __init__(self, input_size, num_classes):
@@ -57,13 +56,9 @@ DataColumns = Data.columns
 ColumnsToKeep = ['cmc','edhrec_rank', 'power',
        'toughness','Creature', 'Enchantment', 'Sorcery',
        'Instant', 'Artifact', 'Battle', 'Planeswalker', '{W}', '{U}', '{B}',
-       '{R}', '{G}', '{C}', '{W/P}', '{U/P}', '{B/P}', '{R/P}', '{G/P}',
-       '{2/W}', '{2/U}', '{2/B}', '{2/R}', '{2/G}', '{C/W}', '{C/U}', '{C/B}',
-       '{C/R}', '{C/G}', '{W/U}', '{W/B}', '{B/R}', '{B/G}', '{U/B}', '{U/R}',
-       '{R/G}', '{R/W}', '{G/W}', '{G/U}', '{W/U/P}', '{W/B/P}', '{B/R/P}',
-       '{B/G/P}', '{U/B/P}', '{U/R/P}', '{R/G/P}', '{R/W/P}', '{G/W/P}',
-       '{G/U/P}', 'LABEL_0', 'LABEL_1', 'LABEL_2', 'score']
+       '{R}', '{G}', '{C}', 'LABEL_0', 'LABEL_1', 'LABEL_2', 'score']
 
+# Remove Columns Unnecessary for Analysis
 for Column in DataColumns:
     if Column not in ColumnsToKeep:
         DataNN = DataNN.drop(Column,axis=1)
@@ -72,8 +67,9 @@ for Column in DataColumns:
 DataNN['toughness'] = DataNN['toughness'].apply(PF.PowToughFix)
 DataNN['power'] = DataNN['power'].apply(PF.PowToughFix)
 DataNNCol = DataNN.columns
+# Plot histograms
 
-# Scale All values in DataNN
+# Scale all values in DataNN using minmax scaler
 scaler = SKPRE.MinMaxScaler()
 DataNN[DataNNCol] = scaler.fit_transform(DataNN[DataNNCol])
 labels = torch.tensor(DataNN['edhrec_rank']).type(torch.float)
@@ -88,11 +84,12 @@ MyData = CustomDataSet(features,labels)
 TrainDataloader = DataLoader(MyData, batch_size = 64, shuffle=True)
 
 # Model Hyperpparameters
-input_size = 55
+input_size = DataNN.shape[1] - 1 # Minus 1 because one of the columns is target
 num_classes = 1 # we only want 1 NN output (edhrec_rank)
 learning_rate = 0.0005
 batch_size = 64
-num_epochs = 10
+num_epochs = 50
+weight_decay = 0.01
 #device = 'cpu'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -100,8 +97,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = NN(input_size = input_size, num_classes= num_classes).to(device)
 
 # Loss and Optimizer
-criterion = nn.L1Loss()
-optimizer = optim.Adam(model.parameters(), lr= learning_rate)
+criterion = nn.MSELoss()
+optimizer = optim.AdamW(model.parameters(), lr= learning_rate, weight_decay = weight_decay)
 
 # Train Network
 for epoch in range(num_epochs):
@@ -121,7 +118,7 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
         loss.backward()
         
-        # gradient descent vs adam step
+        # gradient descent, adamW step
         optimizer.step()
     
     print('Loss = ' ,loss.item())
