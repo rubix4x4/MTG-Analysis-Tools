@@ -48,7 +48,7 @@ class CustomDataSet:
         return feature, label
 
 # Load PandaDataSet
-f = open('Parsed Data Sets/FullPostOracleAnalysis.json', encoding='utf8')
+f = open('Parsed Data Sets/CreaturePostOracle.json', encoding='utf8')
 data = json.load(f)
 Data = pd.DataFrame.from_records(data)
 DataNN = Data
@@ -86,7 +86,7 @@ TrainDataloader = DataLoader(MyData, batch_size = 64, shuffle=True)
 # Model Hyperpparameters
 input_size = DataNN.shape[1] - 1 # Minus 1 because one of the columns is target
 num_classes = 1 # we only want 1 NN output (edhrec_rank)
-learning_rate = 0.0005
+learning_rate = 0.00005
 batch_size = 64
 num_epochs = 50
 weight_decay = 0.01
@@ -97,7 +97,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = NN(input_size = input_size, num_classes= num_classes).to(device)
 
 # Loss and Optimizer
-criterion = nn.MSELoss()
+criterion = nn.L1Loss()
 optimizer = optim.AdamW(model.parameters(), lr= learning_rate, weight_decay = weight_decay)
 
 # Train Network

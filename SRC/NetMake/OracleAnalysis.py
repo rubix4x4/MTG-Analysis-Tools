@@ -16,12 +16,12 @@ print(torch.cuda.is_available())
 print(torch.cuda.get_device_name())
 
 #model_name = "Test_Train_Location"
-model_name = "Models\MTG_Oracle_Analysis"
+model_name = "Models\MTG_Oracle_Analysis_Creature"
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 classifier = pipeline ("sentiment-analysis", model=model, tokenizer=tokenizer, device=0)
 
-datapandas = pd.read_json('Parsed Data Sets/FullSetPreClassifier.json')
+datapandas = pd.read_json('Parsed Data Sets/PreClass/CreaturePreClass.json')
 #datapandas = pd.read_json('Parsed Data Sets/SmallSetPreClassifier.json')
 
 TierLabels = ['LABEL_0','LABEL_1','LABEL_2']
@@ -62,5 +62,5 @@ TierDF = pd.DataFrame(TierArray, columns = TierLabels)
 ConfidenceDF = pd.DataFrame(ConfidenceArray, columns = ['score'])
 datapandas = datapandas.join(TierDF)
 datapandas = datapandas.join(ConfidenceDF)
-PF.WriteJsonFromPD(datapandas,'FullPostOracleAnalysis')
+PF.WriteJsonFromPD(datapandas,'CreaturePostOracle')
 print("End")

@@ -1,4 +1,4 @@
-# Train the Oracle Text Analyzer 
+# Train the Oracle Text Analyzer, one for each card type
 import pandas as pd
 import json
 import os
@@ -42,8 +42,8 @@ for x in ClassifierData.columns:
     if x not in CoI:
         ClassifierData = ClassifierData.drop(x, axis=1)
 
-plt.plot(ClassifierData['edhrec_rank'], 'o', color='black')
-plt.show()
+#plt.plot(ClassifierData['edhrec_rank'], 'o', color='black')
+#plt.show()
 
 # Assign EDHREC Rank Based Labels
 Labels = ParseFunc.EdhrecLabels(ClassifierData)
@@ -80,7 +80,7 @@ training_args = TrainingArguments(
    learning_rate=1e-5,
    per_device_train_batch_size=16,
    per_device_eval_batch_size=16,
-   num_train_epochs=4,
+   num_train_epochs=5,
    weight_decay=0.01,
    save_strategy="epoch",
    push_to_hub=False,
